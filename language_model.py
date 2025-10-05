@@ -230,3 +230,116 @@ def get_suggestions(previous_tokens, n_gram_counts_list, vocabulary, k=1.0, star
                                     k=k, start_with=start_with)
         suggestions.append(suggestion)
     return suggestions
+
+
+class LanguageModel:
+    """
+    N-gram Language Model class for autocomplete and text generation evaluation.
+    """
+    
+    def __init__(self, n_max=4, k=1.0):
+        """
+        Initialize the language model.
+        
+        Args:
+            n_max: Maximum n-gram order to use
+            k: Smoothing parameter
+        """
+        self.n_max = n_max
+        self.k = k
+        self.vocabulary = None
+        self.n_gram_counts_list = []
+        self.vocabulary_size = 0
+        
+    def fit(self, training_data, vocabulary):
+        """
+        Train the language model on the given data.
+        
+        Args:
+            training_data: List of tokenized sentences
+            vocabulary: Set/list of vocabulary words
+        """
+        self.vocabulary = vocabulary
+        self.vocabulary_size = len(vocabulary)
+        
+        # Build n-gram counts for all orders
+        self.n_gram_counts_list = []
+        for n in range(1, self.n_max + 1):
+            n_gram_counts = count_n_grams(training_data, n)
+            self.n_gram_counts_list.append(n_gram_counts)
+    
+    def get_user_input_suggestions(self, previous_tokens, num_suggestions=5, start_with=None):
+        """
+        Get word suggestions for autocomplete given previous tokens.
+        
+        Args:
+            previous_tokens: List of previous words in the context
+            num_suggestions: Number of suggestions to return
+            start_with: Optional prefix for suggested words
+            
+        Returns:
+            List of (word, probability) tuples sorted by probability
+        """
+        if not self.n_gram_counts_list or not self.vocabulary:
+            return []
+        
+        # Collect suggestions from different n-gram orders
+        all_suggestions = {}
+        
+        # Try different context lengths (from longest to shortest)
+        for context_len in range(min(len(previous_tokens), self.n_max - 1), 0, -1):
+            if context_len > len(previous_tokens):
+                continue
+                
+            context = previous_tokens[-context_len:]
+            
+            if context_len < len(self.n_gram_counts_list):
+                n_gram_counts = self.n_gram_counts_list[context_len - 1]
+                n_plus1_gram_counts = self.n_gram_counts_list[context_len]
+                
+                # Get all possible next words and their probabilities
+                probabilities = estimate_probabilities(
+                    context, n_gram_counts, n_plus1_gram_counts, 
+                    self.vocabulary, k=self.k
+                )
+                
+                # Filter by start_with if provided
+                for word, prob in probabilities.items():
+                    if start_with is None or word.startswith(start_with):
+                        # Use maximum probability if word appears multiple times
+                        if word not in all_suggestions or prob > all_suggestions[word]:
+                            all_suggestions[word] = prob
+        
+        # Sort by probability and return top suggestions
+        sorted_suggestions = sorted(all_suggestions.items(), 
+                                  key=lambda x: x[1], reverse=True)
+        
+        return sorted_suggestions[:num_suggestions]
+    
+    def calculate_perplexity(self, sentence):
+        """
+        Calculate perplexity of a sentence using the trained model.
+        
+        Args:
+            sentence: Input sentence (string or list of tokens)
+            
+        Returns:
+            Perplexity score
+        """
+        if isinstance(sentence, str):
+            import nltk
+            tokens = nltk.word_tokenize(sentence.lower())
+        else:
+            tokens = sentence
+        
+        if not self.n_gram_counts_list or len(self.n_gram_counts_list) < 2:
+            return float('inf')
+        
+        # Use the highest order model available
+        n_gram_counts = self.n_gram_counts_list[-2]  # n-gram counts
+        n_plus1_gram_counts = self.n_gram_counts_list[-1]  # (n+1)-gram counts
+        
+        return calculate_perplexity(
+            tokens, n_gram_counts, n_plus1_gram_counts, 
+            self.vocabulary_size, k=self.k
+        )
