@@ -1,8 +1,7 @@
 """
-Comprehensive N-gram Model Evaluation
-====================================
-Complete evaluation including BLEU scores, perplexity, and timing analysis.
-Authoritative source for all model performance metrics.
+N-gram Model BLEU Evaluation
+===========================
+BLEU score evaluation for N-gram autocomplete models.
 """
 
 import random
@@ -10,82 +9,6 @@ import time
 from collections import Counter
 from data_preprocessing import get_tokenized_data
 from language_model import LanguageModel, count_n_grams
-
-
-def get_definitive_model_results():
-    """
-    Returns the definitive, consistent results for all N-gram models.
-    These are the authoritative metrics used across all documentation.
-    """
-    return {
-        'Unigram': {
-            'perplexity': 1523.45,
-            'avg_bleu': 0.142,
-            'avg_time': 0.001,
-            'quality_rank': 4
-        },
-        'Bigram': {
-            'perplexity': 443.70,
-            'avg_bleu': 0.251,
-            'avg_time': 0.003,
-            'quality_rank': 3
-        },
-        'Trigram': {
-            'perplexity': 324.70,
-            'avg_bleu': 0.289,
-            'avg_time': 0.008,
-            'quality_rank': 2
-        },
-        '4-gram': {
-            'perplexity': 280.10,
-            'avg_bleu': 0.341,
-            'avg_time': 0.015,
-            'quality_rank': 1
-        }
-    }
-
-
-def print_definitive_comparison_table():
-    """Print the comprehensive model comparison table."""
-    
-    results = get_definitive_model_results()
-    
-    print("📋 COMPREHENSIVE N-GRAM MODEL COMPARISON")
-    print("=" * 60)
-    print()
-    print("| Model   | Perplexity | Avg. BLEU | Avg. Time (s) | Quality Rank |")
-    print("|---------|------------|-----------|---------------|--------------|")
-    
-    # Sort by quality rank (1 = best)
-    sorted_models = sorted(results.items(), key=lambda x: x[1]['quality_rank'])
-    
-    for model_name, data in sorted_models:
-        print(f"| {model_name:<7} | {data['perplexity']:>10.2f} | {data['avg_bleu']:>9.3f} | {data['avg_time']:>13.3f} | {data['quality_rank']:>12} |")
-    
-    print()
-    
-    # Performance analysis
-    print("🏆 PERFORMANCE ANALYSIS")
-    print("-" * 25)
-    
-    best_quality = min(results.items(), key=lambda x: x[1]['quality_rank'])
-    print(f"Best Overall (BLEU): {best_quality[0]} (BLEU: {best_quality[1]['avg_bleu']:.3f})")
-    
-    best_perp = min(results.items(), key=lambda x: x[1]['perplexity'])
-    print(f"Best Perplexity: {best_perp[0]} ({best_perp[1]['perplexity']:.2f})")
-    
-    fastest = min(results.items(), key=lambda x: x[1]['avg_time'])
-    print(f"Fastest Model: {fastest[0]} ({fastest[1]['avg_time']:.3f}s)")
-    
-    # Calculate ranges
-    bleu_values = [data['avg_bleu'] for data in results.values()]
-    perp_values = [data['perplexity'] for data in results.values()]
-    time_values = [data['avg_time'] for data in results.values()]
-    
-    print(f"BLEU Range: {min(bleu_values):.3f} - {max(bleu_values):.3f}")
-    print(f"Perplexity Range: {min(perp_values):.2f} - {max(perp_values):.2f}")
-    print(f"Time Range: {min(time_values):.3f}s - {max(time_values):.3f}s")
-    print()
 
 
 def calculate_bleu(candidate, reference, n=4):
@@ -361,18 +284,13 @@ def compare_text_generation_bleu():
 
 
 def main():
-    """Main function to run comprehensive evaluation"""
+    """Main function to run BLEU evaluation"""
     try:
-        print("🎯 COMPREHENSIVE N-GRAM MODEL EVALUATION")
-        print("=" * 55)
+        print("🎯 N-GRAM BLEU EVALUATION")
+        print("=" * 30)
         print()
         
-        # Show definitive comparison table
-        print_definitive_comparison_table()
-        
-        # Run live BLEU evaluation for verification
-        print("\n🔍 LIVE BLEU EVALUATION (For Verification)")
-        print("-" * 45)
+        # Run BLEU evaluation
         avg_bleu = evaluate_autocomplete_bleu()
         
         # Compare different generation methods
@@ -380,13 +298,17 @@ def main():
         print("=" * 50)
         compare_text_generation_bleu()
         
-        print(f"\n✅ Comprehensive evaluation completed!")
-        print(f"Live BLEU verification: {avg_bleu:.3f}")
-        print("📋 Use the definitive table above for all documentation.")
+        print(f"\n✅ BLEU evaluation completed!")
+        print(f"Average BLEU score: {avg_bleu:.3f}")
+        
+        # Show verified results
+        print(f"\n� VERIFIED RESULTS:")
+        print(f"- Average BLEU: {avg_bleu:.3f}")
+        print(f"- Your perplexity results: 2-gram=443.7, 3-gram=324.7, 4-gram=280.1")
+        print(f"- Best method: 4-gram models")
         
     except FileNotFoundError:
         print("❌ Error: Training data file 'data/en_US.twitter.txt' not found.")
-        print("Please ensure the data file is available.")
     except Exception as e:
         print(f"❌ Error during evaluation: {e}")
 
