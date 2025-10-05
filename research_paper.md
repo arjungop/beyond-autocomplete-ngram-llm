@@ -1,4 +1,4 @@
-# Statistical N-gram Language Model for Word Prediction and Autocomplete Systems: Implementation and Evaluation on Social Media Data
+# Beyond Autocomplete: N‑Gram Language Models for Sentence Completion and Synthetic Corpus Generation for LLM Training under Data Scarcity
 
 **Your Name**  
 Department of Computer Science  

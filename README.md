@@ -1,6 +1,6 @@
-# Statistical N-gram Autocomplete Language Model
+# Beyond Autocomplete: N‑Gram Language Models for Sentence Completion and Synthetic Corpus Generation
 
-🎯 **Advanced word prediction and autocomplete system using statistical N-gram language models trained on social media data**
+🎯 **Advanced N-gram language models for sentence completion, synthetic corpus generation, and LLM training under data scarcity conditions**
 
 [![Language](https://img.shields.io/badge/Python-3.7+-blue.svg)](https://python.org)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
