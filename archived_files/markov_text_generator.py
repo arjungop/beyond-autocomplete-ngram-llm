@@ -1,7 +1,15 @@
 """
 Markov Chain Text Generator
-===========================
-Implementation of a Markov chain text generator for natural language generation.
+
+This module implements a simple 2-gram (bigram) Markov chain text generator
+that builds a probabilistic model of text and generates random sentences
+based on the learned patterns.
+
+Usage:
+    python markov_text_generator.py <num_words> < input_text_file.txt
+
+Example:
+    python markov_text_generator.py 100 < data/en_US.twitter.txt
 """
 
 import collections
@@ -11,10 +19,10 @@ import textwrap
 
 
 class MarkovTextGenerator:
-    """Markov chain text generator using bigram transitions"""
+    """A simple Markov chain text generator using bigrams."""
     
     def __init__(self):
-        """Initialize the generator"""
+        """Initialize the generator with an empty possibles table."""
         self.possibles = collections.defaultdict(list)
         self.trained = False
     
