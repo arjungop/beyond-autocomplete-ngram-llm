@@ -2,73 +2,118 @@
 Markov Chain Text Generator
 ===========================
 Implementation of a Markov chain text generator for natural language generation.
+This module creates text by learning bigram transitions from training data.
 """
 
-import collections
-import random
-import sys
-import textwrap
+# Import required libraries
+import collections  # For defaultdict to store word transitions
+import random       # For random word selection during generation
+import sys         # For system-level operations
+import textwrap    # For formatting generated text output
 
 
 class MarkovTextGenerator:
-    """Markov chain text generator using bigram transitions"""
+    """
+    Markov chain text generator using bigram transitions.
+    
+    This class implements a simple Markov chain model where each word is predicted
+    based on the previous two words (bigram context). The model learns transition
+    probabilities from training text and uses them for text generation.
+    """
     
     def __init__(self):
-        """Initialize the generator"""
+        """
+        Initialize the Markov text generator.
+        
+        Sets up empty data structures for storing word transitions and
+        initializes the training state flag.
+        """
+        # Dictionary to store possible next words for each word pair (bigram)
+        # Key: (word1, word2) tuple, Value: list of possible next words
         self.possibles = collections.defaultdict(list)
+        
+        # Flag to track if model has been trained
         self.trained = False
     
     def train_from_text(self, text):
         """
-        Train the Markov model from input text.
+        Train the Markov model from input text string.
+        
+        This method processes the input text to build bigram transitions.
+        For each sequence of three consecutive words (w1, w2, w3), it learns
+        that w3 can follow the bigram (w1, w2).
         
         Args:
             text (str): The input text to train on
         """
-        # Initialize prefix words
+        # Initialize the sliding window with empty strings
+        # w1 and w2 represent the previous two words in our bigram context
         w1 = w2 = ''
         
-        # Process each line of text
+        # Process each line of the input text separately
         for line in text.splitlines():
+            # Split line into individual words
             for word in line.split():
-                # Add word as a possible continuation of the current bigram
+                # Record that 'word' can follow the bigram (w1, w2)
+                # This builds our transition probability table
                 self.possibles[w1, w2].append(word)
-                # Shift the window: previous w2 becomes w1, current word becomes w2
+                
+                # Slide the window forward: shift words left and add new word
+                # Previous w2 becomes new w1, current word becomes new w2
                 w1, w2 = w2, word
         
-        # Handle end of input to avoid empty possibles lists
+        # Handle end of input to create proper sentence endings
+        # Add empty string as possible continuation to indicate text end
         self.possibles[w1, w2].append('')
         self.possibles[w2, ''].append('')
         
+        # Mark model as trained
         self.trained = True
     
     def train_from_file(self, filename):
         """
         Train the Markov model from a text file.
         
+        This method reads a text file and trains the model on its contents.
+        Handles file reading errors gracefully with appropriate error messages.
+        
         Args:
-            filename (str): Path to the text file
+            filename (str): Path to the text file to read and train on
         """
         try:
+            # Open file with UTF-8 encoding to handle international characters
             with open(filename, 'r', encoding='utf-8') as f:
+                # Read entire file content into memory
                 text = f.read()
+            
+            # Train the model using the file content
             self.train_from_text(text)
+            
         except FileNotFoundError:
+            # Handle case where file doesn't exist
             print(f"Error: File '{filename}' not found.")
-            sys.exit(1)
+            sys.exit(1)  # Exit with error code
+            
         except UnicodeDecodeError:
+            # Handle case where file encoding is incompatible
             print(f"Error: Could not decode file '{filename}'. Please check the encoding.")
-            sys.exit(1)
+            sys.exit(1)  # Exit with error code
     
     def train_from_stdin(self):
-        """Train the Markov model from standard input."""
-        # Initialize prefix words
+        """
+        Train the Markov model from standard input (stdin).
+        
+        This method allows training from piped input or interactive text entry.
+        Useful for command-line usage where text is provided via pipe or redirect.
+        """
+        # Initialize the sliding window with empty strings
         w1 = w2 = ''
         
-        # Process each line from stdin
+        # Read and process each line from standard input
         for line in sys.stdin:
+            # Split each line into individual words
             for word in line.split():
-                # Add word as a possible continuation of the current bigram
+                # Record that 'word' can follow the bigram (w1, w2)
                 self.possibles[w1, w2].append(word)
                 # Shift the window: previous w2 becomes w1, current word becomes w2
                 w1, w2 = w2, word
